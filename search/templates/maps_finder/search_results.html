@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de la búsqueda</title>
+</head>
+<body>
+    <h1>Resultados de la búsqueda</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Sitio web</th>
+                <th>Teléfono</th>
+                <th>Redes sociales</th>
+                <th>Mapa</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for place in results %}
+            <tr>
+                <td>{{ place.name }}</td>
+                <td>{{ place.address }}</td>
+                <td><a href="{{ place.website }}" target="_blank">{{ place.website }}</a></td>
+                <td>{{ place.phone_number }}</td>
+                <td>{{ place.social_media }}</td>
+                <td><a href="{{ place.map_url }}" target="_blank">Ver en el mapa</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'search' %}">Hacer una nueva búsqueda</a>
+</body>
+</html>
