@@ -136,6 +136,3 @@ leadshunter/
 ## Licencia
 
 Este proyecto está licenciado bajo la [MIT License](LICENSE).
-```
-
-Copia y pega este texto directamente en tu archivo `README.md`. Asegúrate de reemplazar los enlaces y configuraciones específicas según sea necesario.
