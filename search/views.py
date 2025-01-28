@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Place  # Cambiar SearchResult por Place
 from .tasks import search_google_places
@@ -8,6 +8,7 @@ import time
 from io import BytesIO
 import pandas as pd
 from .utils import get_coordinates, google_places_search, extract_place_details
+
 
 def search_view(request):
     """
