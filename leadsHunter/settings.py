@@ -1,7 +1,7 @@
 import os
-import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Cargar variables desde .env
 load_dotenv()
@@ -56,31 +56,37 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'leadsHunter.wsgi.application'
 
+# Base de datos con valores por defecto seguros
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"postgres://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('POSTGRES_DB')}",
+        default="postgres://user:password@db:5432/finder_db",
         conn_max_age=600
     )
 }
 
-CELERY_BROKER_URL = "amqp://guest:guest@rabbitmq:5672/"
+# Celery
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "amqp://guest:guest@rabbitmq:5672/")
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 
+# Internacionalización
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']  # <--- importante
 
+
+# Archivos multimedia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Config por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -92,7 +98,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',  # Adjust log level as needed
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -100,9 +106,11 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',  # Adjust log level as needed
+            'level': 'DEBUG',
             'propagate': True,
         },
     },
 }
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+
+# API externa
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")

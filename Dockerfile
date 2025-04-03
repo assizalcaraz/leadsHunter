@@ -1,16 +1,15 @@
 FROM python:3.9-slim
+
+# Establecer el directorio de trabajo
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Copiar requerimientos e instalar
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-COPY . /app
+# Copiar el resto del código
+COPY . .
 
-# Asegura que el directorio raíz esté en el PYTHONPATH
-ENV PYTHONPATH=/app
-
-CMD ["gunicorn", "leadsHunter.wsgi:application", "--bind", "0.0.0.0:8001"]
-
-#Celery
-RUN adduser --disabled-password celeryuser
-USER celeryuser
+# Exponer el puerto (opcional, solo documentación)
+EXPOSE 8000
