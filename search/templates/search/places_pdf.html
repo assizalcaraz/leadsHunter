@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Exportación de Lugares</title>
+    <style>
+        body { font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #444; padding: 6px; }
+    </style>
+</head>
+<body>
+    <h1>Lugares Exportados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th><th>Dirección</th><th>Website</th><th>Teléfono</th><th>Redes</th><th>Consulta</th><th>Mapa</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in places %}
+            <tr>
+                <td>{{ p.name }}</td>
+                <td>{{ p.address }}</td>
+                <td>{{ p.website }}</td>
+                <td>{{ p.phone_number }}</td>
+                <td>{{ p.social_media }}</td>
+                <td>{{ p.query }}</td>
+                <td>{{ p.map_url }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

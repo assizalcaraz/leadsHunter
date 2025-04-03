@@ -8,6 +8,9 @@ import time
 from io import BytesIO
 import pandas as pd
 from .utils import get_coordinates, google_places_search, extract_place_details
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
 
 
 def search_view(request):
@@ -19,30 +22,22 @@ def search_view(request):
         city = request.POST.get("city")
         distance = request.POST.get("distance")
 
-        # Depuración
         print(f"Ciudad recibida: {city}")
         print(f"Palabras clave: {keywords}")
         print(f"Distancia: {distance}")
 
-        # Llama a la tarea de Celery para realizar la búsqueda
         search_google_places.delay(keywords, city, distance)
-
-        # Redirige al usuario a la página de resultados
         return redirect("search_results")
 
-    # Renderiza el formulario para una nueva búsqueda
-    return render(request, "maps_finder/search.html")
+    return render(request, "search/search.html")  # ← cambiado
 
 
 def search_results_view(request):
     """
     Vista para mostrar los resultados de búsqueda almacenados.
     """
-    # Carga los resultados disponibles desde la base de datos
     results = Place.objects.all().order_by("-id")[:50]
-
-    # Renderiza la página de resultados
-    return render(request, "maps_finder/search_results.html", {"results": results})
+    return render(request, "search/search_results.html", {"results": results})  # ← cambiado
 
 
 def finder(keywords, city, distance):
@@ -67,7 +62,6 @@ def finder(keywords, city, distance):
             name, address, website, phone_number, social_media = extract_place_details(place_id)
             url = f"https://www.google.com/maps/place/?q=place_id:{place_id}"
 
-            # Guardar en la base de datos
             place_obj = Place(
                 name=name if name else None,
                 address=address if address else None,
@@ -78,19 +72,18 @@ def finder(keywords, city, distance):
                 map_url=url
             )
             place_obj.save()
-
             all_results.append(place_obj)
 
-        # Retraso aleatorio para evitar bloqueos
         delay = random.uniform(0.1, 0.5)
         print(f"Esperando {delay:.2f} segundos antes de la próxima búsqueda...")
         time.sleep(delay)
 
     return all_results
 
+
 def export_places(request, format='csv'):
     """
-    Exporta los lugares guardados en la base de datos en diferentes formatos (CSV, JSON, Excel).
+    Exporta los lugares guardados en la base de datos en diferentes formatos (CSV, JSON, Excel, PDF).
     """
     places = Place.objects.all()
 
@@ -101,8 +94,15 @@ def export_places(request, format='csv'):
         writer.writerow(['Nombre', 'Dirección', 'Website', 'Teléfono', 'Redes Sociales', 'Consulta', 'Mapa URL'])
 
         for place in places:
-            writer.writerow([place.name, place.address, place.website, place.phone_number, place.social_media, place.query, place.map_url])
-
+            writer.writerow([
+                place.name,
+                place.address,
+                place.website,
+                place.phone_number,
+                place.social_media,
+                place.query,
+                place.map_url
+            ])
         return response
 
     elif format == 'json':
@@ -133,8 +133,16 @@ def export_places(request, format='csv'):
             writer.save()
             buffer.seek(0)
             response.write(buffer.getvalue())
-
         return response
+
+    elif format == 'pdf':
+        html_string = render_to_string('search/places_pdf.html', {'places': places})  # ← cambiado
+        with tempfile.NamedTemporaryFile(delete=True) as temp_file:
+            HTML(string=html_string).write_pdf(target=temp_file.name)
+            temp_file.seek(0)
+            response = HttpResponse(temp_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename="places.pdf"'
+            return response
 
     else:
         return HttpResponse("Formato no soportado.", status=400)
