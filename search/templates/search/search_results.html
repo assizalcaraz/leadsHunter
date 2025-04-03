@@ -6,10 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/resultados.css' %}">
-    <title>Resultados de la búsqueda</title>
 </head>
 <body>
     <h1>Resultados de la búsqueda</h1>
+
+    <div class="button-group">
+        <a href="{% url 'export_places' 'pdf' %}" class="action-button">Exportar a PDF</a>
+        <a href="{% url 'search' %}" class="action-button">Nueva búsqueda</a>
+    </div>
+    
+
     <table>
         <thead>
             <tr>
@@ -35,12 +41,6 @@
         </tbody>
     </table>
 
-    <div style="margin-top: 20px;">
-        <a href="{% url 'export_places' 'pdf' %}" class="export-button">Exportar a PDF</a>
-    </div>
 
-    <div style="margin-top: 20px;">
-        <a href="{% url 'search' %}">Hacer una nueva búsqueda</a>
-    </div>
 </body>
 </html>
