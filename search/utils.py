@@ -4,6 +4,8 @@ import time
 import random
 from datetime import datetime
 
+
+
 # Inicializa el cliente de Google Maps utilizando una clave desde las variables de entorno
 gmaps = googlemaps.Client(key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
@@ -27,15 +29,28 @@ def get_coordinates(city_name):
 
 def google_places_search(query, location, radius):
     """
-    Realiza una búsqueda de lugares en Google Places API.
+    Realiza una búsqueda de lugares en Google Places API, incluyendo paginación.
     """
     try:
-        results = gmaps.places(query=query, location=location, radius=radius)
-        places = results.get('results', [])
-        return places
+        all_results = []
+        response = gmaps.places(query=query, location=location, radius=radius)
+        all_results.extend(response.get('results', []))
+
+        # Google recomienda esperar unos segundos antes de usar el next_page_token
+        next_page_token = response.get('next_page_token')
+        while next_page_token:
+            time.sleep(2)  # Evita error 403 por token aún no válido
+            response = gmaps.places(page_token=next_page_token)
+            all_results.extend(response.get('results', []))
+            next_page_token = response.get('next_page_token')
+
+        return all_results
+
     except Exception as e:
         print(f"Error realizando la búsqueda: {e}")
         return []
+
+
 
 def extract_place_details(place_id):
     """

@@ -1,16 +1,18 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Place  # Cambiar SearchResult por Place
-from .tasks import search_google_places
-import csv
-import random
-import time
-from io import BytesIO
-import pandas as pd
-from .utils import get_coordinates, google_places_search, extract_place_details
 from django.template.loader import render_to_string
-from weasyprint import HTML
+from .models import Place
+from io import BytesIO
+import csv
+import pandas as pd
 import tempfile
+import os
+from weasyprint import HTML
+from django.conf import settings
+from django.core.serializers import serialize
+from .tasks import search_google_places
+from django.shortcuts import render, redirect
+
 
 
 def search_view(request):
@@ -81,6 +83,8 @@ def finder(keywords, city, distance):
     return all_results
 
 
+from django.templatetags.static import static
+
 def export_places(request, format='csv'):
     """
     Exporta los lugares guardados en la base de datos en diferentes formatos (CSV, JSON, Excel, PDF).
@@ -130,13 +134,20 @@ def export_places(request, format='csv'):
         with BytesIO() as buffer:
             writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
             df.to_excel(writer, index=False, sheet_name='Places')
-            writer.save()
+            writer.close()
             buffer.seek(0)
             response.write(buffer.getvalue())
         return response
 
     elif format == 'pdf':
-        html_string = render_to_string('search/places_pdf.html', {'places': places})  # ← cambiado
+        # Ruta absoluta del logo para que funcione con WeasyPrint
+        logo_url = request.build_absolute_uri(static("plenor.png"))
+
+        html_string = render_to_string('search/places_pdf.html', {
+            'places': places,
+            'logo_url': logo_url
+        })
+
         with tempfile.NamedTemporaryFile(delete=True) as temp_file:
             HTML(string=html_string).write_pdf(target=temp_file.name)
             temp_file.seek(0)

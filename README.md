@@ -5,6 +5,7 @@ LeadsHunter es una aplicación Django diseñada para la búsqueda y gestión efi
 ## Características
 
 - **Gestión de búsquedas:** Permite buscar lugares a través de palabras clave, ciudad y distancia.
+- **Exportación de resultados:** Permite exportar la lista de lugares en formato CSV, JSON, Excel y PDF.
 - **Despliegue en contenedores:** Configuración completa usando Docker Compose para garantizar portabilidad y consistencia.
 - **Procesamiento asíncrono:** Integración con Celery y RabbitMQ para manejar tareas largas o en segundo plano.
 - **Nginx como proxy inverso:** Maneja el enrutamiento de solicitudes y sirve archivos estáticos.
@@ -33,6 +34,7 @@ LeadsHunter es una aplicación Django diseñada para la búsqueda y gestión efi
 2. **Crear un archivo `.env` en la raíz del proyecto:**
 
    ```env
+   ENV=dev
    POSTGRES_USER=usuario
    POSTGRES_PASSWORD=contraseña
    POSTGRES_DB=leads_hunter
@@ -44,20 +46,18 @@ LeadsHunter es una aplicación Django diseñada para la búsqueda y gestión efi
 3. **Construir y ejecutar los contenedores:**
 
    ```bash
-   docker compose up --build -d
+   make dev
    ```
 
 4. **Recopilar los archivos estáticos:**
 
-   Ejecutar el comando desde el contenedor `web`:
-
    ```bash
-   docker compose exec web python manage.py collectstatic
+   make collectstatic-dev
    ```
 
 5. **Acceso a la aplicación:**
 
-   La aplicación estará disponible en: [http://localhost:8080](http://localhost:8080)
+   La aplicación estará disponible en: [http://localhost:8000](http://localhost:8000)
 
 ---
 
@@ -65,74 +65,66 @@ LeadsHunter es una aplicación Django diseñada para la búsqueda y gestión efi
 
 ```plaintext
 leadshunter/
-├── Dockerfile               # Configuración del contenedor web
-├── docker-compose.yaml      # Configuración de servicios con Docker Compose
-├── .env                     # Variables de entorno (no se incluye en el repo)
-├── leadsHunter/             # Proyecto Django principal
-├── search/                  # Aplicación interna de búsqueda
+├── Dockerfile
+├── docker-compose.yaml
+├── docker-compose.dev.yaml
+├── .env (ignorado en el repositorio)
+├── leadsHunter/
+├── search/
 ├── nginx/
-│   └── nginx.conf           # Configuración de Nginx
-├── static/                  # Archivos estáticos
-├── media/                   # Archivos subidos por el usuario
-└── requirements.txt         # Dependencias de Python
+│   └── nginx.conf
+├── static/
+├── media/
+├── Makefile
+├── README.md
+├── requirements.txt
+└── bitacora_makefile.md
 ```
 
 ---
 
 ## Servicios principales
 
-1. **Web:** Servidor Gunicorn que ejecuta la aplicación Django.
-2. **Base de datos:** PostgreSQL para almacenamiento de datos.
-3. **Mensajería:** RabbitMQ para manejar tareas asíncronas con Celery.
-4. **Servidor proxy:** Nginx para servir archivos estáticos y manejar el enrutamiento de solicitudes.
+1. **Web:** Servidor Gunicorn (producción) o `runserver` (desarrollo).
+2. **Base de datos:** PostgreSQL para almacenamiento.
+3. **Mensajería:** RabbitMQ + Celery.
+4. **Servidor proxy (producción):** Nginx.
 
 ---
 
-## Comandos útiles
+## Comandos útiles con Makefile
 
-- **Levantar los servicios:**
-  ```bash
-  docker compose up -d
-  ```
+Ver la [Bitácora y Manual de Makefile](bitacora_makefile.md) para más detalles.
 
-- **Detener los servicios:**
-  ```bash
-  docker compose down
-  ```
+Ejemplos:
 
-- **Ejecutar migraciones de base de datos:**
-  ```bash
-  docker compose exec web python manage.py migrate
-  ```
-
-- **Crear un superusuario:**
-  ```bash
-  docker compose exec web python manage.py createsuperuser
-  ```
+- `make dev`: Levanta entorno de desarrollo.
+- `make migrate-dev`: Aplica migraciones.
+- `make stop-prod`: Detiene producción.
 
 ---
 
 ## Problemas comunes y soluciones
 
 1. **Los estilos no se aplican:**
-   - Asegúrate de haber ejecutado `collectstatic`.
-   - Verifica la configuración de Nginx para los archivos estáticos.
+   - Ejecutá `make collectstatic-dev`.
+   - Verificá Nginx si estás en producción.
 
-2. **Conexión fallida con PostgreSQL:**
-   - Revisa las variables de entorno en el archivo `.env`.
-   - Verifica que el servicio de base de datos esté corriendo.
+2. **Error con PostgreSQL:**
+   - Revisá el `.env` y que el servicio `db` esté activo.
 
-3. **RabbitMQ no se conecta:**
-   - Asegúrate de que el usuario y contraseña de RabbitMQ en el archivo `.env` sean correctos.
+3. **RabbitMQ no conecta:**
+   - Asegurá usuario/clave correctos.
 
 ---
 
 ## Contribuciones
 
-¡Las contribuciones son bienvenidas! Si encuentras algún problema o deseas agregar nuevas funcionalidades, no dudes en crear un [issue](https://github.com/tu-usuario/leadshunter/issues) o enviar un pull request.
+¡Las contribuciones son bienvenidas! Si encontrás algún problema o querés sumar funcionalidades, creá un [issue](https://github.com/tu-usuario/leadshunter/issues) o enviá un PR.
 
 ---
 
 ## Licencia
 
 Este proyecto está licenciado bajo la [MIT License](LICENSE).
+

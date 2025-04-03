@@ -28,6 +28,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: leadshunter-web
+    env_file:
+      - .env.dev
     volumes:
       - .:/app
       - ./static:/app/static
@@ -43,6 +45,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: leadshunter-celery
+    env_file:
+      - .env.dev
     volumes:
       - .:/app
     depends_on:
