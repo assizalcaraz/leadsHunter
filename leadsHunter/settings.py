@@ -3,19 +3,19 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-# Cargar variables desde .env
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key")
-
-DEBUG = os.getenv("DEBUG", "True") == "True"
+# Seguridad y entorno
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key").strip()
+DEBUG = os.getenv("DEBUG", "True").strip() == "True"
+ENV = os.getenv("ENV", "dev").strip()
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,web").split(",")
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "http://localhost:8080").split(",")
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:8080']
-
+# Aplicaciones
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'search',
 ]
 
+# Middleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -38,6 +39,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'leadsHunter.urls'
 
+# Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -56,10 +58,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'leadsHunter.wsgi.application'
 
-# Base de datos con valores por defecto seguros
+# Base de datos
 DATABASES = {
     'default': dj_database_url.config(
-        default="postgres://user:password@db:5432/finder_db",
+        default=os.getenv("DATABASE_URL", "postgresql://user:password@db:5432/finder_db"),
         conn_max_age=600
     )
 }
@@ -75,18 +77,20 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Archivos estáticos
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']  # <--- importante
-
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles' if ENV == "prod" else None
 
 # Archivos multimedia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Config por defecto
+# Otros
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
 
-# Logging
+# Logging básico
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -98,7 +102,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
@@ -106,11 +110,8 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'DEBUG' if DEBUG else 'INFO',
             'propagate': True,
         },
     },
 }
-
-# API externa
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY", "")
