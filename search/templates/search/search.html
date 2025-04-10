@@ -11,14 +11,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Buscar lugares</h1>
+        <h1 class="card-title vertical">
+            <img src="{% static 'plenor.png' %}" alt="Logo" class="logo-stacked">
+            <span>Buscador de proveedores y comercios</span>
+          </h1>
+          
         <form method="POST" action="{% url 'search' %}">
             {% csrf_token %}
             <label for="keywords">Palabras clave:</label>
             <input type="text" id="keywords" name="keywords" required>
             <label for="city">Ciudad:</label>
             <input type="text" id="city" name="city" required>
-            <label for="distance">Distancia (km):</label>
+            <label for="distance">Radio de búsqueda (km):</label>
             <input type="number" id="distance" name="distance" min="1" required>
             <button type="submit">Buscar</button>
         </form>
