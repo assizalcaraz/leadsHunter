@@ -13,6 +13,26 @@ LeadsHunter es una aplicación Django diseñada para la búsqueda y gestión efi
 
 ---
 
+## Capturas de pantalla
+
+### Formulario de búsqueda
+
+![Formulario de búsqueda](examples/img/formulario-busqueda.png)
+
+---
+
+### Resultados de búsqueda
+
+![Resultados](examples/img/resultados-busqueda.png)
+
+---
+
+### Ejemplo de reporte PDF
+
+![PDF generado](examples/img/reporte-pdf.png)
+
+---
+
 ## Requisitos previos
 
 - Docker (v20.10 o superior)
@@ -75,6 +95,11 @@ leadshunter/
 │   └── nginx.conf
 ├── static/
 ├── media/
+├── docs/
+│   └── img/
+│       ├── formulario-busqueda.png
+│       ├── resultados-busqueda.png
+│       └── ejemplo-reporte-pdf.png
 ├── Makefile
 ├── README.md
 ├── requirements.txt
@@ -127,4 +152,3 @@ Ejemplos:
 ## Licencia
 
 Este proyecto está licenciado bajo la [MIT License](LICENSE).
-
